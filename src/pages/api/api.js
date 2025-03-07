@@ -1,4 +1,5 @@
-export const BASE_URL = `http://10.5.50.125:8000/`;
+// export const BASE_URL = `http://10.5.50.125:8000/`;
+export const BASE_URL = `https://ponahealth.keltech.co.tz/`
 
 export const login = async (data)=>{
     const res = await fetch(`${BASE_URL}api/token/`,{
@@ -48,6 +49,45 @@ export const getDoctorApplication = async (user_id)=>{
     return body;
 }
 
+
+export const updateDoctorApplication = async (data)=>{
+    // alert(JSON.stringify(`${BASE_URL}api/v1/application_read/?user_id=${user_id}/`))
+    let url = `${BASE_URL}api/v1/application_read/${data.id}/`
+    // alert(JSON.stringify(data));
+
+    // alert(url)
+
+    // return;
+    const res = await fetch(url,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json",
+        },
+        body:JSON.stringify(data)
+    })
+    const body = await res.json()
+    return body;
+}
+
+
+
+
+export const getDoctorApplications = async (data)=>{
+    // alert(JSON.stringify(`${BASE_URL}api/v1/application_read/?user_id=${user_id}/`))
+    // alert(data.slug)
+    let url = `${BASE_URL}api/v1/application_read/?slug=${data.slug}`
+    // alert(url);
+
+    // return;
+    const res = await fetch(url,{
+        method:"GET",
+        headers:{
+            "Content-Type":"application/json",
+        },
+    })
+    const body = await res.json()
+    return body;
+}
 
 export const getSpeciality = async ()=>{
     const res = await fetch(`${BASE_URL}api/v1/specialist/`,{
@@ -105,9 +145,7 @@ export const addNewDoctor = async (data)=>{
 
 export const updateDoctorDetails= async ({formData,editingDoctor})=>{
     let form = JSON.stringify(formData)
-    // alert(JSON.stringify(form))
-    // return;
-    const res = await fetch(`${BASE_URL}api/v1/profile/${editingDoctor.id}`,{
+    const res = await fetch(`${BASE_URL}api/v1/profile/${editingDoctor.id}/`,{
 
         method:"PUT",
         headers:{
@@ -134,9 +172,10 @@ export const deleteDoctor = async (id)=>{
 }
 
 
-export const getDoctors = async (slug)=>{
+export const getDoctors = async (data)=>{
    
-    const res = await fetch(`${BASE_URL}api/v1/profile_read/?slug=doctor`,{
+    // alert(`${BASE_URL}api/v1/profile_read/?slug=${data.slug}&country=${data.origin}`)
+    const res = await fetch(`${BASE_URL}api/v1/profile_read/?slug=${data.slug}&country=${data.origin}`,{
         method:"GET",
     })
     const body = await res.json()

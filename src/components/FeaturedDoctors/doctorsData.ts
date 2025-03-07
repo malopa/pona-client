@@ -19,6 +19,8 @@ const doctorImages = [
   'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=250&h=250'
 ];
 
+
+
 const getRandomImage = () => doctorImages[Math.floor(Math.random() * doctorImages.length)];
 
 export const doctorsData: DoctorsData = {

@@ -4,32 +4,44 @@ import DoctorCard from './DoctorCard';
 import { Rocket, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { doctorsData } from './doctorsData';
+import { useQuery } from '@tanstack/react-query';
+import {getSpeciality,getCountry,addNewDoctor,getDoctors,deleteDoctor,updateDoctorDetails} from '../../pages/api/api'
 
-const countries = [
-  { code: 'South Africa', name: 'South Africa', flag: '🇿🇦' },
-  { code: 'Tanzania', name: 'Tanzania', flag: '🇹🇿' },
-  { code: 'Kenya', name: 'Kenya', flag: '🇰🇪' },
-  { code: 'Rwanda', name: 'Rwanda', flag: '🇷🇼' },
-  { code: 'Uganda', name: 'Uganda', flag: '🇺🇬' },
-  { code: 'Burundi', name: 'Burundi', flag: '🇧🇮' }
-];
+
+// const countries = [
+//   { code: 'South Africa', name: 'South Africa', flag: '🇿🇦' },
+//   { code: 'Tanzania', name: 'Tanzania', flag: '🇹🇿' },
+//   { code: 'Kenya', name: 'Kenya', flag: '🇰🇪' },
+//   { code: 'Rwanda', name: 'Rwanda', flag: '🇷🇼' },
+//   { code: 'Uganda', name: 'Uganda', flag: '🇺🇬' },
+//   { code: 'Burundi', name: 'Burundi', flag: '🇧🇮' }
+// ];
 
 // Coming soon countries
 const comingSoonCountries = ['USA', 'UK', 'UAE', 'Germany'];
 
 export default function FeaturedDoctors() {
-  const [activeCountry, setActiveCountry] = useState('South Africa');
   const [featuredDoctors, setFeaturedDoctors] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeCountry, setActiveCountry] = useState(1);
 
+
+
+  const {data:countries} = useQuery({queryKey:['countries'],queryFn:async ()=> getCountry()})
+  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors',activeCountry],queryFn:async ()=> getDoctors({slug:"doctor",origin:activeCountry})})
+
+
+  
   const isComingSoon = comingSoonCountries.includes(activeCountry);
+
 
   useEffect(() => {
     if (!isComingSoon) {
-      fetchFeaturedDoctors(activeCountry);
+      // fetchFeaturedDoctors(activeCountry);
     }
   }, [activeCountry, isComingSoon]);
+
 
   const fetchFeaturedDoctors = async (country: string) => {
     try {
@@ -92,12 +104,12 @@ export default function FeaturedDoctors() {
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
           Featured Doctors
         </h2>
-        
+        {countries && 
         <CountryTabs
           countries={countries}
           activeCountry={activeCountry}
           onSelect={setActiveCountry}
-        />
+        />}
 
         {isComingSoon ? (
           <div className="bg-white rounded-xl shadow-lg p-8 text-center animate-fade-in">
@@ -126,13 +138,14 @@ export default function FeaturedDoctors() {
               </button>
             </div>
           </div>
-        ) : isLoading ? (
+        ) : isDoctorLoading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
           </div>
-        ) : featuredDoctors.length > 0 ? (
+        ) : doctors?.filter(d=>d.is_featured==true).length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {featuredDoctors.map((doctor) => (
+            {/* {JSON.stringify(doctors)} */}
+            {doctors?.filter(d=>d.is_featured==true)?.map((doctor) => (
               <DoctorCard 
                 key={doctor.id} 
                 {...doctor} 

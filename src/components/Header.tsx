@@ -17,6 +17,9 @@ export default function Header() {
   const [showLanguages, setShowLanguages] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  const auth = localStorage.getItem("userAuth")
+  // const auth = localStorage.getItem("userAuth")
+  // alert(auth)
   useEffect(() => {
     // Check authentication status
     const checkAuth = () => {
@@ -39,9 +42,12 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      // await supabase.auth.signOut();
       localStorage.removeItem('userAuth');
       localStorage.removeItem('userData');
+      localStorage.removeItem('access');
+      localStorage.removeItem('refresh');
+      localStorage.removeItem('user_id');
       navigate('/');
       window.location.reload(); // Refresh to update all components
     } catch (error) {
@@ -118,7 +124,7 @@ export default function Header() {
               )}
             </div>
 
-            {isAuthenticated ? (
+            {auth ? (
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg 

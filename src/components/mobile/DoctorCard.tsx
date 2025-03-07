@@ -4,24 +4,31 @@ import { Star, Phone } from 'lucide-react';
 import { isSpecialist } from '../utils/doctorUtils';
 import { useTranslation } from '../../hooks/useTranslation';
 
+
+
+interface specialistProps{
+  id:number;
+  name:string;
+}
 interface DoctorCardProps {
   id: string;
   name: string;
-  specialty: string;
+  specialist: specialistProps;
   rating: number;
-  image: string;
+  profile_url: string;
   country: string;
 }
 
-export default function DoctorCard({ id, name, specialty, rating, image, country }: DoctorCardProps) {
+export default function DoctorCard({ id, name, specialist, rating, profile_url, country }: DoctorCardProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const specialist = isSpecialist(specialty);
+  const _specialist = isSpecialist(specialist?.name || "General Practitioner");
 
   const handleBookClick = () => {
+    let specialty = specialist.name
     navigate(`/book/${id}`, { 
       state: { 
-        doctor: { id, name, specialty, image },
+        doctor: { id, name, specialty, profile_url },
         country 
       } 
     });
@@ -29,18 +36,18 @@ export default function DoctorCard({ id, name, specialty, rating, image, country
 
   // Format specialty key by removing spaces and converting to lowercase
   const getSpecialtyKey = (specialty: string) => {
-    return `specialty.${specialty.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '')}`;
+    return `specialty.${specialist?.name.toLowerCase().replace(/\s+/g, '').replace(/[^a-z]/g, '')}`;
   };
 
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all transform hover:scale-[1.02] active:scale-98 duration-200">
       <div className="relative">
         <img 
-          src={image} 
+          src={profile_url} 
           alt={name}
           className="w-full h-24 object-cover rounded-t-xl"
         />
-        {specialist && (
+        {_specialist && (
           <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-purple-500 text-white text-[10px] font-medium rounded-full shadow-lg">
             {t('booking.specialist')}
           </span>
@@ -49,7 +56,7 @@ export default function DoctorCard({ id, name, specialty, rating, image, country
       <div className="p-2">
         <div className="mb-1">
           <h3 className="font-medium text-xs text-gray-900 truncate">{name}</h3>
-          <p className="text-gray-600 text-xs truncate">{t(getSpecialtyKey(specialty))}</p>
+          <p className="text-gray-600 text-xs truncate">{t(getSpecialtyKey(specialist?.name))}</p>
         </div>
         <div className="flex items-center mb-2">
           {[...Array(5)].map((_, i) => (

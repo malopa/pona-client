@@ -58,7 +58,7 @@ const comingSoonCountries = ['USA', 'UK', 'UAE', 'Germany'];
 
 export default function DoctorsPage() {
   const navigate = useNavigate();
-  const [selectedCountry, setSelectedCountry] = useState('South Africa');
+  const [selectedCountry, setSelectedCountry] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showDoctorAuth, setShowDoctorAuth] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -69,7 +69,7 @@ export default function DoctorsPage() {
 
   const isComingSoon = comingSoonCountries.includes(selectedCountry);
 
-  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors'],queryFn:async ()=> getDoctors("doctor")})
+  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors',selectedCountry],queryFn:async ()=> getDoctors({slug:"doctor",origin:selectedCountry})})
   const {data:countries} = useQuery({queryKey:['countries'],queryFn:async ()=> getCountry()})
   const {data:specialties} = useQuery({queryKey:['specialties'],queryFn:async ()=> getSpeciality()})
   const {data:consultationTypes} = useQuery({queryKey:['consultation-types'],queryFn:async ()=> getConsultationTypes()})
@@ -88,16 +88,16 @@ export default function DoctorsPage() {
   const countryDoctors = selectedCountry ? doctorsData[selectedCountry] || [] : [];
 
   // Apply filters
-  const filteredDoctors = countryDoctors.filter(doctor => {
-    const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === 'All Specialties' || doctor.specialty === selectedSpecialty;
+  const filteredDoctors = doctors?.filter(doctor => {
+    const matchesSearch = doctor?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         doctor?.specialist.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSpecialty = selectedSpecialty === 'All Specialties' || doctor?.specialist?.id === selectedSpecialty;
     const matchesRating = doctor.rating >= selectedRating;
     return matchesSearch && matchesSpecialty && matchesRating;
   });
 
   // Sort doctors
-  const sortedDoctors = [...filteredDoctors].sort((a, b) => {
+  const sortedDoctors = [...doctors?doctors:[]].sort((a, b) => {
     if (sortBy === 'rating') return b.rating - a.rating;
     if (sortBy === 'name') return a.name.localeCompare(b.name);
     return 0;
@@ -165,9 +165,9 @@ export default function DoctorsPage() {
               {countries?.map(({ id,code, name, flag }) => (
                 <button
                   key={id}
-                  onClick={() => setSelectedCountry(code)}
+                  onClick={() => setSelectedCountry(id)}
                   className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all
-                    ${selectedCountry === code
+                    ${selectedCountry === id
                       ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg'
                       : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
                     }`}
@@ -278,7 +278,8 @@ export default function DoctorsPage() {
                 diligently to bring you access to top-quality healthcare professionals in your region.
               </p>
 
-              <button className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 
+              <button 
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white px-8 py-3 
                              rounded-lg shadow-lg shadow-emerald-500/20 hover:shadow-xl 
                              hover:shadow-emerald-500/30 transition-all transform hover:scale-105 
                              active:scale-95">
@@ -288,11 +289,11 @@ export default function DoctorsPage() {
           </div>
         ) : (
           <>
-            {sortedDoctors.length > 0 ? (
+            {filteredDoctors?.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {sortedDoctors.map((doctor) => (
+                {filteredDoctors?.map((doctor) => (
                   <DoctorCard
-                    key={doctor.name}
+                    key={doctor.id}
                     {...doctor}
                     country={selectedCountry}
                   />

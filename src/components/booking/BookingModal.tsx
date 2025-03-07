@@ -201,7 +201,7 @@ export default function BookingModal({ doctor, country, onClose }: BookingModalP
                         </div>
                       </div>
                       <span className="text-emerald-600 font-semibold">
-                        {pricing.symbol}{isSpecialistDoctor ? pricing.specialistVideoCost : pricing.videoCost}
+                        {pricing?.symbol}{isSpecialistDoctor ? pricing?.specialistVideoCost : pricing?.videoCost}
                       </span>
                     </div>
                   </div>
@@ -219,7 +219,7 @@ export default function BookingModal({ doctor, country, onClose }: BookingModalP
                         </div>
                       </div>
                       <span className="text-emerald-600 font-semibold">
-                        {pricing.symbol}{isSpecialistDoctor ? pricing.specialistPhoneCost : pricing.phoneCost}
+                        {pricing?.symbol}{isSpecialistDoctor ? pricing?.specialistPhoneCost : pricing?.phoneCost}
                       </span>
                     </div>
                   </div>
@@ -252,7 +252,7 @@ export default function BookingModal({ doctor, country, onClose }: BookingModalP
                         </div>
                       </div>
                       <span className="text-emerald-600 font-semibold">
-                        {pricing.symbol}{isSpecialistDoctor ? pricing.specialistSubscription15 : pricing.subscription15}
+                        {pricing?.symbol}{isSpecialistDoctor ? pricing?.specialistSubscription15 : pricing?.subscription15}
                       </span>
                     </div>
                   </div>
@@ -283,7 +283,7 @@ export default function BookingModal({ doctor, country, onClose }: BookingModalP
                         </div>
                       </div>
                       <span className="text-emerald-600 font-semibold">
-                        {pricing.symbol}{isSpecialistDoctor ? pricing.specialistSubscription30 : pricing.subscription30}
+                        {pricing?.symbol}{isSpecialistDoctor ? pricing?.specialistSubscription30 : pricing?.subscription30}
                       </span>
                     </div>
                   </div>
@@ -299,7 +299,7 @@ export default function BookingModal({ doctor, country, onClose }: BookingModalP
           country={country}
           packageType={planType || 'single'}
           doctorType={isSpecialistDoctor ? 'specialist' : 'general'}
-          amount={isSpecialistDoctor ? pricing.specialistVideoCost : pricing.videoCost}
+          amount={isSpecialistDoctor ? pricing?.specialistVideoCost : pricing?.videoCost}
           isEmergency={isEmergency}
           appointmentDetails={planType === 'single' ? {
             date,

@@ -120,7 +120,7 @@ export default function DoctorApplicationForm() {
       const user_id = localStorage.getItem("user_id")
       if (!user_id) alert("not authorized");
 
-      // alert(JSON.stringify({...formData,documents:images,doctor:user_id}))
+      // alert(JSON.stringify({...formData,years_of_experience:formData.experience,specialist:formData.specialty,license_number:formData.license,documents:images,user_id:user_id}))
       // return;
 
       mutation.mutate({...formData,years_of_experience:formData.experience,specialist:formData.specialty,license_number:formData.license,documents:images,user_id:user_id})

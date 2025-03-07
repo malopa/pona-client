@@ -13,17 +13,17 @@ interface CountryTabsProps {
 export default function CountryTabs({ countries, activeCountry, onSelect }: CountryTabsProps) {
   return (
     <div className="flex flex-wrap justify-center gap-2 mb-8">
-      {countries.map(({ code, name, flag }) => (
+      {countries.map(({ id,code, name, flag }) => (
         <button
           key={code}
-          onClick={() => onSelect(code)}
+          onClick={() => onSelect(id)}
           className={`px-6 py-2 rounded-full transition-colors flex items-center gap-2 ${
-            activeCountry === code
+            activeCountry === id
               ? 'bg-emerald-500 text-white'
               : 'bg-white text-gray-700 hover:bg-emerald-50'
           }`}
         >
-          <span className="text-base">{flag}</span>
+          <img src={flag} width={30} className="text-base" />
           <span className="text-sm font-medium">{name}</span>
         </button>
       ))}

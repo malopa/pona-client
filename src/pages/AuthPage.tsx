@@ -51,7 +51,7 @@ export default function AuthPage() {
     phone: '',
     password: '',
     specialty: '',
-    experience: '',
+    experience: 0,
     license: '',
     bio: '',
     role:isDoctor?'docotr':'patient'
@@ -61,7 +61,6 @@ export default function AuthPage() {
 
   const loginMutation = useMutation({
     mutationFn:login,onSuccess:(data)=>{
-      // alert(JSON.stringify(data))
      
 
       if(data?.status){
@@ -78,9 +77,13 @@ export default function AuthPage() {
 
    const mutation = useMutation({
       mutationFn:addNewDoctor,onSuccess:(data)=>{
+
         if(data?.status){
           setIsLogin(true)
           // return;
+        }else{
+      alert(JSON.stringify(data))
+
         }
         // return;
 
@@ -95,74 +98,15 @@ export default function AuthPage() {
 
     try {
       if (isLogin) {
-
+               
         loginMutation.mutate({username:formData.email,password:formData.password})
-        // Sign in
-        // const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        //   email: formData.email,
-        //   password: formData.password
-        // });
+      
 
-
-        // if (signInError) throw signInError;
-
-        // Verify if user is a doctor when logging into doctor portal
-        // if (isDoctor) {
-        //   const { data: doctorData, error: doctorError } = await supabase
-        //     .from('doctors')
-        //     .select('*')
-        //     .eq('id', data.user.id)
-        //     .single();
-
-        //   if (doctorError || !doctorData) {
-        //     throw new Error('Unauthorized access. Please sign in with a doctor account.');
-        //   }
-        // }
       } else {
-        // Sign up
-        mutation.mutate({...formData,year_of_experience:formData.experience})
+        
+        mutation.mutate({...formData,year_of_experience:formData.experience,role:'patient'})
 
-        // const { data, error: signUpError } = await supabase.auth.signUp({
-        //   email: formData.email,
-        //   password: formData.password,
-        //   options: {
-        //     data: {
-        //       full_name: formData.name,
-        //       role: isDoctor ? 'doctor' : 'patient'
-        //     }
-        //   }
-        // });
 
-        // if (signUpError) throw signUpError;
-
-        // if (isDoctor) {
-          // Create doctor profile
-          // const { error: doctorError } = await supabase
-          //   .from('doctors')
-          //   .insert([{
-          //     id: data.user?.id,
-          //     specialty: formData.specialty,
-          //     experience_years: parseInt(formData.experience),
-          //     license_number: formData.license,
-          //     bio: formData.bio,
-          //     is_verified: false
-          //   }]);
-
-          // if (doctorError) throw doctorError;
-
-          // Create doctor application
-        //   const { error: applicationError } = await supabase
-        //     .from('doctor_applications')
-        //     .insert([{
-        //       doctor_id: data.user?.id,
-        //       status: 'pending'
-        //     }]);
-
-        //   if (applicationError) throw applicationError;
-        // }
-
-        // localStorage.setItem(isDoctor ? 'doctorAuth' : 'userAuth', 'true');
-        // navigate(isDoctor ? '/doctor/dashboard?tab=application' : '/');
       }
     } catch (error) {
       console.error('Authentication error:', error);
@@ -175,8 +119,11 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 flex">
       {/* Left Column - Welcome Message */}
+      <div>The test</div>
+
+
       <div className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-center">
-        <Logo className="h-16 w-16 mb-8 text-emerald-500" />
+        <Logo className="h-16 w-16 mb-8 text-emerald-500" /> 
         <h1 className="text-4xl font-bold text-gray-900 mb-6">
           {isDoctor ? (
             "Join Our Network of Healthcare Professionals"
@@ -231,7 +178,7 @@ export default function AuthPage() {
                 ? `Sign in to continue to ${isDoctor ? 'Doctor Portal' : 'Pona Health'}`
                 : `Join Pona Health as a ${isDoctor ? 'Doctor' : 'Patient'}`
               }
-            </p>
+            </p>  
           </div>
 
           {error && (
@@ -239,7 +186,6 @@ export default function AuthPage() {
               {error}
             </div>
           )}
-
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div>
@@ -259,7 +205,7 @@ export default function AuthPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address 
+                Email Address   
               </label>
               <div className="relative">
                 <input

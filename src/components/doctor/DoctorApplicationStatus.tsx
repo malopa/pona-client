@@ -195,10 +195,10 @@ export default function DoctorApplicationStatus() {
 </div>
 
 {/* Application Notes */}
-{application?.bio && (
+{application?.notes && (
   <div className="bg-gray-50 rounded-lg p-4">
     <h4 className="font-medium text-gray-900 mb-2">Notes</h4>
-    <p className="text-gray-600">{application?.bio}</p>
+    <p className="text-gray-600">{application?.notes}</p>
   </div>
 )}
 

@@ -71,7 +71,7 @@ export default function DoctorManagement() {
 
   const {data} = useQuery({queryKey:['speciality'],queryFn:async ()=> getSpeciality()})
   const {data:countries} = useQuery({queryKey:['countries'],queryFn:async ()=> getCountry()})
-  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors'],queryFn:async ()=> getDoctors("doctor")})
+  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors',selectedCountry],queryFn:async ()=> getDoctors({slug:"doctor",origin:selectedCountry})})
 
   // alert(JSON.stringify(countries))
   useEffect(() => {
@@ -142,13 +142,13 @@ export default function DoctorManagement() {
     }
   };
 
-  const handleVerify = async (doctorId: string, verified: boolean) => {
+  const handleVerify = async (doctor, verified: boolean) => {
     try {
-      const { error } = await supabase
-        .from('doctors')
-        .update({ is_verified: verified })
-        .eq('id', doctorId);
 
+      let formData = {...doctor,is_verified:verified,country:doctor.country.id,specialist:doctor.specialist.id,email:doctor.user.email}
+      let editingDoctor = {id:doctor.id}
+      updateMutation.mutate({formData,editingDoctor})
+      
       if (error) throw error;
 
       // setDoctors(doctors.map(doc => 
@@ -160,12 +160,14 @@ export default function DoctorManagement() {
     }
   };
 
-  const handleFeature = async (doctorId: string, featured: boolean) => {
+  const handleFeature = async (doctor, featured: boolean) => {
     try {
-      const { error } = await supabase
-        .from('doctors')
-        .update({ is_featured: featured })
-        .eq('id', doctorId);
+     
+
+      let formData = {...doctor,is_featured:featured,country:doctor?.country?.id,specialist:doctor.specialist.id,email:doctor.user.email}
+      let editingDoctor = {id:doctor.id}
+      updateMutation.mutate({formData,editingDoctor})
+      
 
       if (error) throw error;
 
@@ -193,7 +195,7 @@ export default function DoctorManagement() {
       // const { error } = await supabase.auth.admin.deleteUser(doctorId);
       // if (error) throw error;
 
-      alert(doctorId)
+      // alert(doctorId)
       delMutation.mutate(+doctorId)
 
       // setDoctors(doctors.filter(doc => doc.id !== doctorId));
@@ -251,12 +253,16 @@ export default function DoctorManagement() {
 
   const mutation = useMutation({
     mutationFn:addNewDoctor,onSuccess:(data)=>{
-      alert(JSON.stringify(data))
-      queryClient.invalidateQueries("doctors")
+      // alert(JSON.stringify(data))
+      if(data?.status){
+        queryClient.invalidateQueries("doctors")
+      }else{
+        alert(JSON.stringify(data))
+      }
     }
   })
 
-  if (isLoading) {
+  if (isDoctorLoading) {
     return (
       <div className="flex justify-center items-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
@@ -376,7 +382,7 @@ export default function DoctorManagement() {
               key={id}
               onClick={() => setSelectedCountry(id)}
               className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                selectedCountry === code
+                selectedCountry === id
                   ? 'bg-emerald-500 text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
@@ -453,7 +459,7 @@ export default function DoctorManagement() {
             <div className="p-2 bg-white/20 rounded-lg">
               <Heart className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-medium">Total Patients--</h3>
+            <h3 className="text-lg font-medium">Total Patients</h3>
           </div>
           <div className="mt-2">
             <p className="text-3xl font-bold">
@@ -468,7 +474,7 @@ export default function DoctorManagement() {
 
       {/* Doctors Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDoctors.map((doctor) => (
+        {doctors?.map((doctor) => (
           <div
             key={doctor.id}
             className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all"
@@ -481,7 +487,7 @@ export default function DoctorManagement() {
               />
               <div className="absolute top-4 right-4 flex gap-2">
                 <button
-                  onClick={() => handleVerify(doctor.id, !doctor.is_verified)}
+                  onClick={() => handleVerify(doctor, !doctor.is_verified)}
                   className={`p-2 rounded-lg transition-colors ${
                     doctor.is_verified
                       ? 'bg-emerald-100 text-emerald-600 hover:bg-emerald-200'
@@ -496,7 +502,7 @@ export default function DoctorManagement() {
                   )}
                 </button>
                 <button
-                  onClick={() => handleFeature(doctor.id, !doctor.is_featured)}
+                  onClick={() => handleFeature(doctor, !doctor.is_featured)}
                   className={`p-2 rounded-lg transition-colors ${
                     doctor.is_featured
                       ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
@@ -518,7 +524,7 @@ export default function DoctorManagement() {
                       <Shield className="w-4 h-4 text-purple-500" />
                     )}
                   </h3>
-                  <p className="text-emerald-600">{doctor?.specialist.name}</p>
+                  <p className="text-emerald-600">{doctor?.specialist?.name}</p>
                 </div>
                 <div className="flex items-center gap-1 text-amber-500">
                   <Star className="w-4 h-4 fill-current" />
@@ -623,7 +629,7 @@ export default function DoctorManagement() {
               if(editingDoctor){
                 updateMutation.mutate({formData,editingDoctor})
               }else{
-                mutation.mutate(formData)
+                mutation.mutate({...formData,role:'doctor'})
               }
             
             } catch (err) {

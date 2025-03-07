@@ -5,25 +5,32 @@ import { countryPricing } from '../booking/pricingData';
 import { isSpecialist } from '../utils/doctorUtils';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
+interface SpecialistCard {
+  id:number,
+  name:string
+}
+
 interface DoctorCardProps {
   name: string;
-  specialty: string;
+  specialist: SpecialistCard;
   rating: number;
   image: string;
   country: string;
+  isSpecialist:boolean;
+  profile_url:string;
 }
 
-export default function DoctorCard({ name, specialty, rating, image, country }: DoctorCardProps) {
+export default function DoctorCard({ name, specialist, rating, image, country,isSpecialist ,profile_url}: DoctorCardProps) {
   const [showBooking, setShowBooking] = useState(false);
-  const specialist = isSpecialist(specialty);
+  // const is_specialist = isSpecialist(isSpecialist);
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  const normalizedCountry = Object.keys(countryPricing).find(key => 
-    key.toLowerCase() === country.toLowerCase() ||
-    (key === 'USA' && country === 'United States') ||
-    (key === 'UK' && country === 'United Kingdom') ||
-    (key === 'UAE' && country === 'United Arab Emirates')
-  ) || country;
+  // const normalizedCountry = Object.keys(countryPricing).find(key => 
+  //   key.toLowerCase() === country.toLowerCase() ||
+  //   (key === 'USA' && country === 'United States') ||
+  //   (key === 'UK' && country === 'United Kingdom') ||
+  //   (key === 'UAE' && country === 'United Arab Emirates')
+  // ) || country;
 
   const handleBookClick = () => {
     // On mobile, users are already authenticated after splash screen
@@ -38,7 +45,7 @@ export default function DoctorCard({ name, specialty, rating, image, country }: 
     <>
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
         <img 
-          src={image} 
+          src={profile_url} 
           alt={name}
           className="w-full h-28 object-cover"
         />
@@ -46,9 +53,9 @@ export default function DoctorCard({ name, specialty, rating, image, country }: 
           <div className="flex items-start justify-between mb-1.5">
             <div>
               <h3 className="font-medium text-sm text-gray-900 truncate">{name}</h3>
-              <p className="text-gray-600 text-xs truncate">{specialty}</p>
+              <p className="text-gray-600 text-xs truncate">{(specialist?.name)}</p>
             </div>
-            {specialist && (
+            {isSpecialist && (
               <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
                 Specialist
               </span>
@@ -77,7 +84,7 @@ export default function DoctorCard({ name, specialty, rating, image, country }: 
 
       {showBooking && (
         <BookingModal
-          doctor={{ name, specialty, image }}
+          doctor={{ name, normalizedCountry, profile_url }}
           country={normalizedCountry}
           onClose={() => setShowBooking(false)}
         />

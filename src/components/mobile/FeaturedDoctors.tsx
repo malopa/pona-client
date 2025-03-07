@@ -5,6 +5,8 @@ import { doctorsData } from '../FeaturedDoctors/doctorsData';
 import DoctorCard from './DoctorCard';
 import { isSpecialist } from '../utils/doctorUtils';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useQuery } from '@tanstack/react-query';
+import {getSpeciality,getCountry,addNewDoctor,getDoctors,deleteDoctor,updateDoctorDetails} from '../../pages/api/api'
 
 interface FeaturedDoctorsProps {
   country: string;
@@ -18,14 +20,18 @@ export default function FeaturedDoctors({ country }: FeaturedDoctorsProps) {
   const generalDoctors = countryDoctors.filter(doc => !isSpecialist(doc.specialty));
   const specialistDoctors = countryDoctors.filter(doc => isSpecialist(doc.specialty));
 
+  const {data:doctors,isLoading:isDoctorLoading} = useQuery({queryKey:['doctors'],queryFn:async ()=> getDoctors({slug:"doctor",origin:''})})
+  
   if (countryDoctors.length === 0) {
     return null;
   }
+  // alert("hello")
 
   return (
     <div className="py-4">
       {/* General Doctors */}
-      {generalDoctors.length > 0 && (
+      {/* {JSON.stringify(doctors)}---- */}
+      {doctors?.filter(p=>p.specialist.name=='General Practitioner').length > 0 && (
         <div className="mb-6">
           <div className="px-4 flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -47,12 +53,12 @@ export default function FeaturedDoctors({ country }: FeaturedDoctorsProps) {
 
           <div className="overflow-x-auto px-4">
             <div className="grid grid-cols-2 gap-3 min-w-full">
-              {generalDoctors.slice(0, 4).map((doctor) => (
+              {doctors?.filter(p=>p.specialist.name=='General Practitioner')?.slice(0, 4).map((doctor) => (
                 <DoctorCard 
                   key={doctor.id} 
                   {...doctor} 
                   country={country}
-                  specialty={t(`specialty.${doctor.specialty.toLowerCase().replace(/\s+/g, '')}`)}
+                  specialty={t(`specialty.${doctor?.specialist?.name.toLowerCase().replace(/\s+/g, '')}`)}
                 />
               ))}
             </div>
@@ -61,7 +67,7 @@ export default function FeaturedDoctors({ country }: FeaturedDoctorsProps) {
       )}
 
       {/* Specialist Doctors */}
-      {specialistDoctors.length > 0 && (
+      {doctors?.filter(p=>p.specialist.name !== 'General Practitioner').length > 0 && (
         <div>
           <div className="px-4 flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -83,12 +89,12 @@ export default function FeaturedDoctors({ country }: FeaturedDoctorsProps) {
 
           <div className="overflow-x-auto px-4">
             <div className="grid grid-cols-2 gap-3 min-w-full">
-              {specialistDoctors.slice(0, 4).map((doctor) => (
+              {doctors?.filter(p=>p.specialist.name !== 'General Practitioner')?.slice(0, 4).map((doctor) => (
                 <DoctorCard 
                   key={doctor.id} 
                   {...doctor} 
                   country={country}
-                  specialty={t(`specialty.${doctor.specialty.toLowerCase().replace(/\s+/g, '')}`)}
+                  specialty={t(`specialty.${doctor.specialist.name.toLowerCase().replace(/\s+/g, '')}`)}
                 />
               ))}
             </div>
