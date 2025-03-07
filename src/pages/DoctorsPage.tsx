@@ -121,7 +121,7 @@ export default function DoctorsPage() {
           </div>
           <div className="flex gap-4">
             <button 
-              onClick={handleApplyNow}
+              onClick={handleDoctorLogin}
               className="flex items-center gap-2 bg-white text-emerald-600 border-2 border-emerald-500 
                        px-6 py-2.5 rounded-lg hover:bg-emerald-50 transition-all transform 
                        hover:scale-105 active:scale-95"
